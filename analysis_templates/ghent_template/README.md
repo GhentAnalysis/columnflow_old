@@ -34,6 +34,8 @@ Defined in [selection/objects.py:electron_object](__cf_module_name__/selection/o
 
 ## Jets
 
+Defined in [selection/objects.py:jet_object](__cf_module_name__/selection/objects.py#L132).
+
 - ak4 Jets (standard Jet collection in NanoAOD)
 - $|\eta| < 2.5$ 
 - $p_T > 30$
