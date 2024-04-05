@@ -12,7 +12,9 @@ Defined in [selection/objects.py:muon_object](__cf_module_name__/selection/objec
 - $\texttt{sip3d} < 8$
 - $d_{xy} < 0.05$ 
 - $d_z < 0.1$
-- Tight: $\texttt{tightId}$
+
+Defined additionally Tight Muons::
+- $\texttt{tightId}$
 
 ## Electrons
 
@@ -28,7 +30,16 @@ Defined in [selection/objects.py:electron_object](__cf_module_name__/selection/o
 - is a PF candidate
 - with conversion veto applied 
 - $\texttt{tightCharge} > 1$
-- without a tight muon closeby ($\\Delta R < 0.05$)
+- without a muon closeby ($\\Delta R < 0.05$)
+
+## Jets
+
+- ak4 Jets (standard Jet collection in NanoAOD)
+- $|\eta| < 2.5$ 
+- $p_T > 30$
+- $\texttt{jetId} \\ge 2$
+- not containing a muon or lepton ($\\Delta R < 0.4$)
+
 
 # Calibration
 
