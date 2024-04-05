@@ -4,7 +4,7 @@
 
 ## Muons
 
-Defined in [selection/objects.py:muon_object](__cf_module_name__/selection/objects.py).
+Defined in [selection/objects.py:muon_object](__cf_module_name__/selection/objects.py#L36).
 
 - $|\eta| < 2.4$ 
 - $p_T > 10$
@@ -16,7 +16,7 @@ Defined in [selection/objects.py:muon_object](__cf_module_name__/selection/objec
 
 ## Electrons
 
-Defined in [selection/objects.py:electron_object](__cf_module_name__/selection/objects.py).
+Defined in [selection/objects.py:electron_object](__cf_module_name__/selection/objects.py#L83).
 
 - $|\eta| < 2.5$ 
 - $p_T > 15$
