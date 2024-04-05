@@ -2,6 +2,8 @@
 
 # Object Definition
 
+All objects collected in [selection/objects.py:object_selection](__cf_module_name__/selection/objects.py#L177).
+
 ## Muons
 
 Defined in [selection/objects.py:muon_object](__cf_module_name__/selection/objects.py#L36).
