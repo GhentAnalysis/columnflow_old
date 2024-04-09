@@ -50,6 +50,7 @@ Defined in [selection/objects.py:jet_object](__cf_module_name__/selection/object
 # Event selection
 
 Full default selection flow collected in [selection/default.py:default](__cf_module_name__/selection/default.py#L213).
+Different selections can be defined by writing a similar function, and changing the configuration at [__cf_module_name__/config/config___cf_short_name_lc__.py:cfg.x.default_selector](__cf_module_name__/config/config___cf_short_name_lc__.py#L340).
 Aim is to select $t\overline{t}$ events.
 
 - triggers applied in [selection/trigger.py:default](__cf_module_name__/selection/trigger.py#L57)
@@ -61,6 +62,8 @@ Aim is to select $t\overline{t}$ events.
     - all leptons in the event should be tight
 - jet selection applied in  [selection/default.py:jet_selection](__cf_module_name__/selection/default.py#L136).
   - one b-tagged jet
+
+Note that selections are calculated as masks but not yet applied. 
 
 # Resources
 
