@@ -76,7 +76,12 @@ Note that selections are calculated as masks but not yet applied.
 
 # Categories / channels
 
-Four channels are defined in the configuration file: $ee$, $e\mu$, $\mu\mu$, and inclusive. (See [config/categories.py](config/categories.py))
+Four channels are defined in the configuration file, described in [config/categories.py](config/categories.py) and implemented in [categorization/example.py](__cf_module_name__/categorization/example.py).
+
+- $ee$ [selection/categories.py:catid_selection_2e](__cf_module_name__/selection/categories.py#24)
+- $e\mu$ [selection/categories.py:catid_selection_1e1mu](__cf_module_name__/selection/categories.py#33)
+- $\mu\mu$ [selection/categories.py:catid_selection_2mu](__cf_module_name__/selection/categories.py#42)
+- inclusive [selection/categories.py:catid_selection_incl](__cf_module_name__/selection/categories.py#14)
 
 
 # Resources
