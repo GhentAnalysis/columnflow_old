@@ -51,8 +51,8 @@ Defined in [selection/objects.py:jet_object](__cf_module_name__/selection/object
 
 Full default selection flow collected in [selection/default.py:default](__cf_module_name__/selection/default.py#L213).
 
-- triggers applied in [selection/trigger.py:default](__cf_module_name__/selection/trigger_selection.py#L57)
-  - listed in [selection/trigger.py:add_triggers](__cf_module_name__/selection/trigger_selection.py#L11)
+- triggers applied in [selection/trigger.py:default](__cf_module_name__/selection/trigger.py#L57)
+  - listed in [selection/trigger.py:add_triggers](__cf_module_name__/selection/trigger.py#L11)
 - lepton selection applied in [selection/default.py:lepton_selection](__cf_module_name__/selection/default.py#L81).
     - close to Z resonance (same flavour, opposite sign, $|m_{\ell\ell} - 91| < 15$)
     - leading lepton $p_T > 30$
