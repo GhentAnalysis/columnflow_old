@@ -49,9 +49,10 @@ Defined in [selection/objects.py:jet_object](__cf_module_name__/selection/object
 
 # Event selection
 
+The Aim is to select $t\overline{t}$ events. 
 Full default selection flow collected in [selection/default.py:default](__cf_module_name__/selection/default.py#L213).
 Different selections can be defined by writing a similar function, and changing the configuration at [__cf_module_name__/config/config___cf_short_name_lc__.py:cfg.x.default_selector](__cf_module_name__/config/config___cf_short_name_lc__.py#L340).
-Aim is to select $t\overline{t}$ events.
+
 
 - triggers applied in [selection/trigger.py:default](__cf_module_name__/selection/trigger.py#L57)
   - listed in [selection/trigger.py:add_triggers](__cf_module_name__/selection/trigger.py#L11)
