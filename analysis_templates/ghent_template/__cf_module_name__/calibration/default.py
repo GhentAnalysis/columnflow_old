@@ -35,9 +35,6 @@ def default(self: Calibrator, events: ak.Array, **kwargs) -> ak.Array:
 # sets dynamically, because what is used and produced depends on whether we are processing MC or data.
 @default.init
 def default_init(self: Calibrator) -> None:
-    """
-
-    """
     if not getattr(self, "dataset_inst", None):
         return
 
