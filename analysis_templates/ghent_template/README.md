@@ -47,9 +47,17 @@ Defined in [selection/objects.py:jet_object](__cf_module_name__/selection/object
 
 # Calibration
 
+Currently only the JEC and JER corrections are implemented. Two procedures are defined:
+- Full JEC uncertainies, no JER: [calibration/default.py:default](__cf_module_name__/calibration/default.py#L21).
+- Only nominal JEC, but also JER: [calibration/default.py:skip_jecunc](__cf_module_name__/calibration/skip_jecunc.py#L50).
+
+The applied procedure can be specified at 
+[__cf_module_name__/config/config___cf_short_name_lc__.py:cfg.x.default_calibrator](__cf_module_name__/config/config___cf_short_name_lc__.py#L339).
+
+
 # Event selection
 
-The Aim is to select $t\overline{t}$ events. 
+The aim is to select $t\overline{t}$ events. 
 Full default selection flow collected in [selection/default.py:default](__cf_module_name__/selection/default.py#L213).
 Different selections can be defined by writing a similar function, and changing the configuration at [__cf_module_name__/config/config___cf_short_name_lc__.py:cfg.x.default_selector](__cf_module_name__/config/config___cf_short_name_lc__.py#L340).
 
