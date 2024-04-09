@@ -54,6 +54,8 @@ Currently only the JEC and JER corrections are implemented. Two procedures are d
 The applied procedure can be specified at 
 [__cf_module_name__/config/config___cf_short_name_lc__.py:cfg.x.default_calibrator](__cf_module_name__/config/config___cf_short_name_lc__.py#L339).
 
+Technical note on functions decorated with @{PROCEDURE_NAME}.init: conceptually, they do the same as the @calibrator decorators used on the calibration functions themselves: they define what the prodecure uses and produces. However, unlike the latter, the former method allows to do dynamically as is done in this example: the function only uses JER or the full JEC uncertainties when it works with MC.
+
 
 # Event selection
 
