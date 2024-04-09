@@ -52,14 +52,14 @@ Currently only the JEC and JER corrections are implemented. Two procedures are d
 - Only nominal JEC, but also JER: [calibration/default.py:skip_jecunc](__cf_module_name__/calibration/skip_jecunc.py#L50).
 
 The applied procedure can be specified at 
-[__cf_module_name__/config/config___cf_short_name_lc__.py:cfg.x.default_calibrator](__cf_module_name__/config/config___cf_short_name_lc__.py#L339).
+[config/config___cf_short_name_lc__.py:cfg.x.default_calibrator](__cf_module_name__/config/config___cf_short_name_lc__.py#L339).
 
 
 # Event selection
 
 The aim is to select $t\overline{t}$ events. 
 Full default selection flow collected in [selection/default.py:default](__cf_module_name__/selection/default.py#L213).
-Different selections can be defined by writing a similar function, and changing the configuration at [__cf_module_name__/config/config___cf_short_name_lc__.py:cfg.x.default_selector](__cf_module_name__/config/config___cf_short_name_lc__.py#L340).
+Different selections can be defined by writing a similar function, and changing the configuration at [config/config___cf_short_name_lc__.py:cfg.x.default_selector](__cf_module_name__/config/config___cf_short_name_lc__.py#L340).
 
 
 - triggers applied in [selection/trigger.py:default](__cf_module_name__/selection/trigger.py#L57)
@@ -73,6 +73,11 @@ Different selections can be defined by writing a similar function, and changing 
   - one b-tagged jet
 
 Note that selections are calculated as masks but not yet applied. 
+
+# Categories / channels
+
+Four channels are defined in the configuration file: $ee$, $e\mu$, $\mu\mu$, and inclusive. (See [config/categories.py](config/categories.py))
+
 
 # Resources
 
