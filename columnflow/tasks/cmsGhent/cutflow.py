@@ -6,6 +6,9 @@ from columnflow.tasks.framework.decorators import view_output_plots
 
 import luigi
 import law
+from columnflow.util import maybe_import
+
+np = maybe_import("numpy")
 
 PlotCutflow.relative = luigi.Parameter(
         default=False,
@@ -76,9 +79,11 @@ def PlotCutflow_run(self):
         if not hists:
             raise Exception("no histograms found to plot")
 
+        total = sum(hists.values()).values() if self.relative else np.ones(len(self.selector_steps))
+
         # sort hists by process order
         hists = OrderedDict(
-            (process_inst.copy_shallow(), hists[process_inst])
+            (process_inst.copy_shallow(), hists[process_inst] / total)
             for process_inst in sorted(hists, key=process_insts.index)
         )
 
