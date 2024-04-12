@@ -2,7 +2,6 @@
 from collections import OrderedDict
 
 from ..cutflow import PlotCutflow as PlotCutflowColumnflow
-from ..cutflow import *
 from columnflow.tasks.framework.decorators import view_output_plots
 
 import luigi
