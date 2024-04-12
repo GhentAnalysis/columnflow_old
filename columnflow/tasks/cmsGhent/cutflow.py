@@ -10,7 +10,7 @@ from columnflow.util import maybe_import
 
 np = maybe_import("numpy")
 
-PlotCutflow.relative = luigi.Parameter(
+PlotCutflow.relative = luigi.BoolParameter(
         default=False,
         significant=False,
         description="name of the variable to use for obtaining event counts; default: 'False'",
