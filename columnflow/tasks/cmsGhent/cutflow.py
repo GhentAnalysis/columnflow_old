@@ -41,7 +41,7 @@ def PlotCutflow_run(self):
     with self.publish_step(f"plotting cutflow in {category_inst.name}"):
         for dataset, inp in self.input().items():
             dataset_inst = self.config_inst.get_dataset(dataset)
-            h_in = inp[self.variable].load(formatter="pickle")
+            h_in = inp["event"].load(formatter="pickle")
 
             # sanity checks
             n_shifts = len(h_in.axes["shift"])
@@ -72,7 +72,7 @@ def PlotCutflow_run(self):
                 }]
 
                 # axis reductions
-                h = h[{"process": sum, "category": sum, self.variable: sum}]
+                h = h[{"process": sum, "category": sum, "event": sum}]
 
                 # add the histogram
                 if process_inst in hists:
@@ -173,7 +173,7 @@ class CreateCutflowTable(
             self.reqs.CreateCutflowHistograms.req(
                 self,
                 dataset=d,
-                variables=(self.variable,),
+                variables=("event",),
                 _exclude={"branches"},
             )
             for d in self.datasets
@@ -186,7 +186,7 @@ class CreateCutflowTable(
                 self,
                 branch=0,
                 dataset=d,
-                variables=(self.variable,),
+                variables=("event",),
             )
             for d in self.datasets
         }
@@ -234,7 +234,7 @@ class CreateCutflowTable(
                 dataset_inst = self.config_inst.get_dataset(dataset)
 
                 # load the histogram of the variable named "event"
-                h_in = inp["hists"]["event"].load(formatter="pickle")
+                h_in = inp["event"].load(formatter="pickle")
 
                 # loop and extract one histogram per process
                 for process_inst in process_insts:
