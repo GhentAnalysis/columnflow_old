@@ -158,13 +158,13 @@ class CreateCutflowTable(
 
     def create_branch_map(self):
         # one category per branch
-        if not self.categories:
+        if not self.category:
             raise Exception(
-                f"{self.__class__.__name__} task cannot build branch map when no categories are "
+                f"{self.__class__.__name__} task cannot build branch map when no category is "
                 "set",
             )
 
-        return list(self.categories)
+        return [self.categories]
 
     def workflow_requires(self):
         reqs = super().workflow_requires()
@@ -207,8 +207,8 @@ class CreateCutflowTable(
             suffix = f"__{self.output_suffix}"
 
         return {
-            "table": self.target(f"table__proc_{self.processes_repr}__cat_{self.categories_repr}{suffix}.txt"),
-            "yields": self.target(f"yields__proc_{self.processes_repr}__cat_{self.categories_repr}{suffix}.json"),
+            "table": self.target(f"table__proc_{self.processes_repr}__cat_{self.category}{suffix}.txt"),
+            "yields": self.target(f"yields__proc_{self.processes_repr}__cat_{self.category}{suffix}.json"),
         }
 
     @law.decorator.log
@@ -219,7 +219,8 @@ class CreateCutflowTable(
         inputs = self.input()
         outputs = self.output()
 
-        category_insts = list(map(self.config_inst.get_category, self.categories))
+        category_inst = self.config_inst.get_category(self.branch_data)
+        leaf_category_insts = category_inst.get_leaf_categories() or [category_inst]
         process_insts = list(map(self.config_inst.get_process, self.processes))
         sub_process_insts = {
             proc: [sub for sub, _, _ in proc.walk_processes(include_self=True)]
@@ -229,12 +230,17 @@ class CreateCutflowTable(
         # histogram data per process
         hists = {}
 
-        with self.publish_step(f"Creating yields for processes {self.processes}, categories {self.categories}"):
+        with self.publish_step(f"Creating cutflow table in {category_inst.name}"):
             for dataset, inp in inputs.items():
                 dataset_inst = self.config_inst.get_dataset(dataset)
 
                 # load the histogram of the variable named "event"
                 h_in = inp["event"].load(formatter="pickle")
+
+                # sanity checks
+                n_shifts = len(h_in.axes["shift"])
+                if n_shifts != 1:
+                    raise Exception(f"shift axis is supposed to only contain 1 bin, found {n_shifts}")
 
                 # loop and extract one histogram per process
                 for process_inst in process_insts:
@@ -252,10 +258,15 @@ class CreateCutflowTable(
                             for p in sub_process_insts[process_inst]
                             if p.id in h.axes["process"]
                         ],
+                        "category": [
+                            hist.loc(c.id)
+                            for c in leaf_category_insts
+                            if c.id in h.axes["category"]
+                        ],
                     }]
 
                     # axis reductions
-                    h = h[{"process": sum, "shift": sum, "event": sum}]
+                    h = h[{"process": sum, "category": sum, "event": sum}]
 
                     # add the histogram
                     if process_inst in hists:
@@ -279,41 +290,35 @@ class CreateCutflowTable(
             for process_inst, h in hists.items():
                 processes.append(process_inst)
 
-                for category_inst in category_insts:
-                    leaf_category_insts = category_inst.get_leaf_categories() or [category_inst]
+                for step in self.selector_steps:
+                    h_step = h[{"step": [step]}]
+                    h_step = h_step[{"step": sum}]
 
-                    h_cat = h[{"category": [
-                        hist.loc(c.id)
-                        for c in leaf_category_insts
-                        if c.id in h.axes["category"]
-                    ]}]
-                    h_cat = h_cat[{"category": sum}]
-
-                    value = Number(h_cat.value)
+                    value = Number(h_step.value)
                     if not self.skip_uncertainties:
                         # set a unique uncertainty name for correct propagation below
                         value.set_uncertainty(
-                            f"mcstat_{process_inst.name}_{category_inst.name}",
-                            np.sqrt(h_cat.variance),
+                            f"mcstat_{process_inst.name}_{step}",
+                            np.sqrt(h_step.variance),
                         )
-                    yields[category_inst].append(value)
+                    yields[step].append(value)
 
             # obtain normalizaton factors
             norm_factors = 1
             if self.normalize_yields == "all":
                 norm_factors = sum(
-                    sum(category_yields)
-                    for category_yields in yields.values()
+                    sum(step_yields)
+                    for step_yields in yields.values()
                 )
             elif self.normalize_yields == "per_process":
                 norm_factors = [
-                    sum(yields[category][i] for category in yields.keys())
-                    for i in range(len(yields[category_insts[0]]))
+                    sum(yields[step][i] for step in yields.keys())
+                    for i in range(len(yields[self.selector_steps[0]]))
                 ]
-            elif self.normalize_yields == "per_category":
+            elif self.normalize_yields == "per_step":
                 norm_factors = {
-                    category: sum(category_yields)
-                    for category, category_yields in yields.items()
+                    step: sum(step_yields)
+                    for step, step_yields in yields.items()
                 }
 
             # initialize dicts
@@ -321,18 +326,18 @@ class CreateCutflowTable(
             raw_yields = defaultdict(dict, {})
 
             # apply normalization and format
-            for category, category_yields in yields.items():
-                for i, value in enumerate(category_yields):
+            for step, step_yields in yields.items():
+                for i, value in enumerate(step_yields):
                     # get correct norm factor per category and process
                     if self.normalize_yields == "per_process":
                         norm_factor = norm_factors[i]
-                    elif self.normalize_yields == "per_category":
-                        norm_factor = norm_factors[category]
+                    elif self.normalize_yields == "per_step":
+                        norm_factor = norm_factors[step]
                     else:
                         norm_factor = norm_factors
 
                     raw_yield = (value / norm_factor).nominal
-                    raw_yields[category.name][processes[i].name] = raw_yield
+                    raw_yields[step][processes[i].name] = raw_yield
 
                     # format yields into strings
                     yield_str = (value / norm_factor).str(
@@ -342,7 +347,7 @@ class CreateCutflowTable(
                     )
                     if "latex" in self.table_format:
                         yield_str = f"${yield_str}$"
-                    yields_str[category.label].append(yield_str)
+                    yields_str[step].append(yield_str)
 
             # create, print and save the yield table
             yield_table = tabulate(yields_str, headers="keys", tablefmt=self.table_format)
