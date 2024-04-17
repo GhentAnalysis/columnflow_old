@@ -86,7 +86,6 @@ def PlotCutflow_run(self):
             (process_inst.copy_shallow(), hists[process_inst] / total)
             for process_inst in sorted(hists, key=process_insts.index)
         )
-
         # call the plot function
         fig, _ = self.call_plot_func(
             self.plot_function,
