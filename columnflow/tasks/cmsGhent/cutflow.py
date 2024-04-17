@@ -148,8 +148,6 @@ class CreateCutflowTable(
         description="Adds a suffix to the output name of the yields table; empty default",
     )
 
-    exclude_index = True
-
     selector_steps_order_sensitive = True
 
     # upstream requirements
