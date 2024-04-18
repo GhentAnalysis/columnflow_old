@@ -128,7 +128,7 @@ class CreateCutflowTable(
         default="pdg",
         significant=False,
         description="rounding format of each number in the yield table; accepts all formats "
-        "understood by scinum.Number.str(), e.g. 'pdg', 'publication', '%.1f' or an integer "
+        "understood by scinum.Number.str(), e.g. 'pdg', 'publication', '%%.1f' or an integer "
         "(number of signficant digits); default: pdg",
     )
     skip_uncertainties = luigi.BoolParameter(
@@ -137,7 +137,7 @@ class CreateCutflowTable(
         description="when True, uncertainties are not displayed in the table; default: False",
     )
     normalize_yields = luigi.ChoiceParameter(
-        choices=(law.NO_STR, "per_process", "per_category", "all"),
+        choices=(law.NO_STR, "per_process", "per_step", "all"),
         default=law.NO_STR,
         significant=False,
         description="string parameter to define the normalization of the yields; "
@@ -158,13 +158,13 @@ class CreateCutflowTable(
 
     def create_branch_map(self):
         # one category per branch
-        if not self.category:
+        if not self.categories:
             raise Exception(
                 f"{self.__class__.__name__} task cannot build branch map when no category is "
                 "set",
             )
 
-        return [self.categories]
+        return list(self.categories)
 
     def workflow_requires(self):
         reqs = super().workflow_requires()
@@ -207,8 +207,8 @@ class CreateCutflowTable(
             suffix = f"__{self.output_suffix}"
 
         return {
-            "table": self.target(f"table__proc_{self.processes_repr}__cat_{self.category}{suffix}.txt"),
-            "yields": self.target(f"yields__proc_{self.processes_repr}__cat_{self.category}{suffix}.json"),
+            "table": self.target(f"table__proc_{self.processes_repr}__steps_{self.branch_data}{suffix}.txt"),
+            "yields": self.target(f"yields__proc_{self.processes_repr}__steps_{self.branch_data}{suffix}.json"),
         }
 
     @law.decorator.log
@@ -266,7 +266,7 @@ class CreateCutflowTable(
                     }]
 
                     # axis reductions
-                    h = h[{"process": sum, "category": sum, "event": sum}]
+                    h = h[{"shift": sum, "process": sum, "category": sum, "event": sum}]
 
                     # add the histogram
                     if process_inst in hists:
@@ -286,14 +286,13 @@ class CreateCutflowTable(
 
             yields, processes = defaultdict(list), []
 
-            # read out yields per category and per process
+            # read out yields per step and per process
             for process_inst, h in hists.items():
                 processes.append(process_inst)
 
                 for step in self.selector_steps:
                     h_step = h[{"step": [step]}]
                     h_step = h_step[{"step": sum}]
-
                     value = Number(h_step.value)
                     if not self.skip_uncertainties:
                         # set a unique uncertainty name for correct propagation below
