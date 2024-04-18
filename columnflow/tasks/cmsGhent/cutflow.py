@@ -121,8 +121,8 @@ class CreateCutflowTable(
     table_format = luigi.Parameter(
         default="fancy_grid",
         significant=False,
-        description="format of the yield table; accepts all formats of the tabulate package; "
-        "default: fancy_grid",
+        description="format of the yield table; accepts all formats of the tabulate package; default: fancy_grid. "
+                    "See https://github.com/astanin/python-tabulate/blob/master/README.md?plain=1#L147",
     )
     number_format = luigi.Parameter(
         default="pdg",
