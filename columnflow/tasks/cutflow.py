@@ -295,6 +295,7 @@ class MergeCutflowHistograms(
         CreateHistograms=CreateCutflowHistograms,
     )
 
+    selector_steps_order_sensitive = True
 
 MergeCutflowHistogramsWrapper = wrapper_factory(
     base_cls=AnalysisTask,
