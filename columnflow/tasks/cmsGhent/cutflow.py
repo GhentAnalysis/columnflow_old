@@ -41,7 +41,7 @@ def PlotCutflow_run(self):
     with self.publish_step(f"plotting cutflow in {category_inst.name}"):
         for dataset, inp in self.input().items():
             dataset_inst = self.config_inst.get_dataset(dataset)
-            h_in = inp["event"].load(formatter="pickle")
+            h_in = inp[self.variable].load(formatter="pickle")
 
             # sanity checks
             n_shifts = len(h_in.axes["shift"])
@@ -72,7 +72,7 @@ def PlotCutflow_run(self):
                 }]
 
                 # axis reductions
-                h = h[{"process": sum, "category": sum, "event": sum}]
+                h = h[{"process": sum, "category": sum, self.variable: sum}]
 
                 # add the histogram
                 if process_inst in hists:
@@ -84,13 +84,14 @@ def PlotCutflow_run(self):
         if not hists:
             raise Exception("no histograms found to plot")
 
-        total = sum(hists.values()).values() if self.relative else np.ones(len(self.selector_steps))
+        total = sum(hists.values()).values() if self.relative else np.ones((len(self.selector_steps) + 1, 1))
 
         # sort hists by process order
         hists = OrderedDict(
             (process_inst.copy_shallow(), hists[process_inst] / total)
             for process_inst in sorted(hists, key=process_insts.index)
         )
+
         # call the plot function
         fig, _ = self.call_plot_func(
             self.plot_function,
