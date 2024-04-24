@@ -2227,10 +2227,7 @@ class MergeHistogramMixin(
             inputs.remove()
 
 
-class MergeHistogramMixin(
-        VariablesMixin,
-        law.LocalWorkflow,
-    ):
+class MergeHistogramMixin(VariablesMixin):
     only_missing = luigi.BoolParameter(
         default=False,
         description="when True, identify missing variables first and only require histograms of "
@@ -2245,33 +2242,6 @@ class MergeHistogramMixin(
     def create_branch_map(self):
         # create a dummy branch map so that this task could be submitted as a job
         return {0: None}
-
-    def workflow_requires(self):
-        reqs = super().workflow_requires()
-
-        reqs["hists"] = self.as_branch().requires()
-
-        return reqs
-
-    def requires(self):
-        # optional dynamic behavior: determine not yet created variables and require only those
-        prefer_cli = {"variables"}
-        variables = self.variables
-        if self.only_missing:
-            prefer_cli.clear()
-            missing = self.output().count(existing=False, keys=True)[1]
-            variables = tuple(sorted(missing, key=variables.index))
-
-        if not variables:
-            return []
-
-        return self.reqs.CreateHistograms.req(
-            self,
-            branch=-1,
-            variables=tuple(variables),
-            _exclude={"branches"},
-            _prefer_cli=prefer_cli,
-        )
 
     def output(self):
         return {"hists": law.SiblingFileCollection({
