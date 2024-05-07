@@ -221,7 +221,7 @@ class CreateCutflowHistograms(
                 events = self.norm_weight_producer(events)
 
             # overwrite steps if not defined yet
-            if not steps:
+            if steps is None:
                 steps = sel.steps.fields
 
             # prepare histograms and exprepssions once

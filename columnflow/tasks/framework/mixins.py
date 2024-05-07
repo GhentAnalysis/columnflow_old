@@ -583,9 +583,9 @@ class SelectorStepsMixin(SelectorMixin):
     """
 
     selector_steps = law.CSVParameter(
-        default=(),
-        description="a subset of steps of the selector to apply; uses all steps when empty; "
-        "empty default",
+        default=None,
+        description="a subset of steps of the selector to apply; uses all steps when None; "
+        "None default",
         brace_expand=True,
         parse_empty=True,
     )
@@ -627,6 +627,9 @@ class SelectorStepsMixin(SelectorMixin):
         if not cls.selector_steps_order_sensitive and "selector_steps" in params:
             params["selector_steps"] = tuple(sorted(params["selector_steps"]))
 
+        if "selector_steps" in params and params["selector_steps"] == (None,):
+           params["selector_steps"] = None 
+
         return params
 
     @classmethod
@@ -663,8 +666,8 @@ class SelectorStepsMixin(SelectorMixin):
         steps = self.selector_steps
         if not self.selector_steps_order_sensitive:
             steps = sorted(steps)
-        if steps:
-            parts["selector"] += "__steps_" + "_".join(steps)
+        if steps is not None:
+            parts["selector"] += ("__steps_" + "_".join(steps) if steps else "__inclusive")
 
         return parts
 
