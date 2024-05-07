@@ -24,6 +24,7 @@ from columnflow.tasks.framework.decorators import view_output_plots
 from columnflow.tasks.framework.remote import RemoteWorkflow
 from columnflow.tasks.external import GetDatasetLFNs
 from columnflow.tasks.selection import SelectEvents
+from columnflow.tasks.calibration import CalibrateEvents
 from columnflow.production import Producer
 from columnflow.util import DotDict, dev_sandbox, maybe_import
 
@@ -51,6 +52,7 @@ class CreateCutflowHistograms(
     reqs = Requirements(
         RemoteWorkflow.reqs,
         GetDatasetLFNs=GetDatasetLFNs,
+        CalibrateEvents=CalibrateEvents,
         SelectEvents=SelectEvents,
     )
 
@@ -71,6 +73,11 @@ class CreateCutflowHistograms(
         reqs = super().workflow_requires()
         reqs["lfns"] = self.reqs.GetDatasetLFNs.req(self)
         if not self.pilot:
+            reqs["calibrations"] = [
+                self.reqs.CalibrateEvents.req(self, calibrator=calibrator_inst.cls_name)
+                for calibrator_inst in self.calibrator_insts
+                if calibrator_inst.produced_columns
+            ]
             reqs["selection"] = self.reqs.SelectEvents.req(self)
         else:
             # pass-through pilot workflow requirements of upstream task
@@ -85,6 +92,11 @@ class CreateCutflowHistograms(
     def requires(self):
         reqs = {
             "lfns": self.reqs.GetDatasetLFNs.req(self),
+            "calibrations": [
+                self.reqs.CalibrateEvents.req(self, calibrator=calibrator_inst.cls_name)
+                for calibrator_inst in self.calibrator_insts
+                if calibrator_inst.produced_columns
+            ],
             "selection": self.reqs.SelectEvents.req(self),
         }
 
@@ -191,6 +203,7 @@ class CreateCutflowHistograms(
 
         input_paths = [nano_file]
         input_paths.append(inputs["selection"]["results"].path)
+        input_paths.extend([inp["columns"].path for inp in inputs["calibrations"]])
         if self.selector_inst.produced_columns:
             input_paths.append(inputs["selection"]["columns"].path)
 
