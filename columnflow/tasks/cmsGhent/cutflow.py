@@ -61,7 +61,7 @@ class CreateCutflowTable(
     # upstream requirements
     reqs = Requirements(
         RemoteWorkflow.reqs,
-        CreateCutflowHistograms=CreateCutflowHistograms,
+        MergeCutflowHistograms=MergeCutflowHistograms,
     )
 
     def create_branch_map(self):
@@ -78,7 +78,7 @@ class CreateCutflowTable(
         reqs = super().workflow_requires()
 
         reqs["hists"] = [
-            self.reqs.CreateCutflowHistograms.req(
+            self.reqs.MergeCutflowHistograms.req(
                 self,
                 dataset=d,
                 variables=("event",),
@@ -90,7 +90,7 @@ class CreateCutflowTable(
 
     def requires(self):
         return {
-            d: self.reqs.CreateCutflowHistograms.req(
+            d: self.reqs.MergeCutflowHistograms.req(
                 self,
                 branch=0,
                 dataset=d,
@@ -143,7 +143,7 @@ class CreateCutflowTable(
                 dataset_inst = self.config_inst.get_dataset(dataset)
 
                 # load the histogram of the variable named "event"
-                h_in = inp["event"].load(formatter="pickle")
+                h_in = inp["hists"]["event"].load(formatter="pickle")
 
                 # sanity checks
                 n_shifts = len(h_in.axes["shift"])
