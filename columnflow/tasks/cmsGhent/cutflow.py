@@ -45,11 +45,11 @@ class CreateCutflowTable(
         description="when True, uncertainties are not displayed in the table; default: False",
     )
     normalize_yields = luigi.ChoiceParameter(
-        choices=(law.NO_STR, "per_process", "per_step", "all"),
+        choices=(law.NO_STR, "per_process", "per_step", "per_process_100", "per_step_100", "all_100"),
         default=law.NO_STR,
         significant=False,
         description="string parameter to define the normalization of the yields; "
-        "choices: '', per_process, per_category, all; empty default",
+        "choices: '', per_process, per_category, all; Append 100 to express as percentage; empty default",
     )
     output_suffix = luigi.Parameter(
         default=law.NO_STR,
@@ -211,20 +211,20 @@ class CreateCutflowTable(
                     yields[step].append(value)
 
             # obtain normalizaton factors
-            norm_factors = 1
+            norm_factors = 0.01 if '100' in self.normalize_yields else 1
             if self.normalize_yields == "all":
-                norm_factors = sum(
+                norm_factors *= sum(
                     sum(step_yields)
                     for step_yields in yields.values()
                 )
-            elif self.normalize_yields == "per_process":
+            elif self.normalize_yields.startswith("per_process"):
                 norm_factors = [
-                    sum(yields[step][i] for step in yields.keys())
+                    norm_factors * sum(yields[step][i] for step in yields.keys())
                     for i in range(len(yields[self.selector_steps[0]]))
                 ]
-            elif self.normalize_yields == "per_step":
+            elif self.normalize_yields.startswith("per_step"):
                 norm_factors = {
-                    step: sum(step_yields)
+                    step: norm_factors * sum(step_yields)
                     for step, step_yields in yields.items()
                 }
 
@@ -236,9 +236,9 @@ class CreateCutflowTable(
             for step, step_yields in yields.items():
                 for i, value in enumerate(step_yields):
                     # get correct norm factor per category and process
-                    if self.normalize_yields == "per_process":
+                    if self.normalize_yields.startswith("per_process"):
                         norm_factor = norm_factors[i]
-                    elif self.normalize_yields == "per_step":
+                    elif self.normalize_yields.startswith("per_step"):
                         norm_factor = norm_factors[step]
                     else:
                         norm_factor = norm_factors
