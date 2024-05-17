@@ -475,7 +475,7 @@ class PlotCutflow(
                     h = h[{"process": sum, "category": sum, self.variable: sum}]
 
                     if self.skip_initial:
-                        h = h[{"steps": self.selector_steps}]
+                        h = h[{"step": self.selector_steps}]
 
                     # add the histogram
                     if process_inst in hists:
