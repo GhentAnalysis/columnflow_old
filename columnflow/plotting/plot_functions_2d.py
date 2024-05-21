@@ -48,6 +48,7 @@ def plot_2d(
     extreme_colors: tuple[str] | None = None,
     colormap: str | None = "",
     skip_legend: bool = False,
+    hide_zero_entries: bool = False,
     cms_label: str = "wip",
     process_settings: dict | None = None,
     variable_settings: dict | None = None,
@@ -79,9 +80,10 @@ def plot_2d(
     if shape_norm:
         h_sum = h_sum / h_sum.sum().value
 
-    # mask bins without any entries (variance == 0)
+    # if requested mask bins without any entries (variance == 0)
     h_view = h_sum.view()
-    h_view.value[h_view.variance == 0] = np.nan
+    if hide_zero_entries:
+        h_view.value[h_view.variance == 0] = np.nan
 
     # check histogram value range
     vmin, vmax = np.nanmin(h_sum.values()), np.nanmax(h_sum.values())
