@@ -78,7 +78,9 @@ def electron_weights(
         ("sfdown", "_down"),
     ]:
         # identification & isolation scale factor
-        sf_flat = self.electron_sf_corrector(self.year, syst, self.wp, sc_eta, pt)
+
+        if self.wp:
+            sf_flat = self.electron_sf_corrector(self.year, syst, self.wp, sc_eta, pt)
 
         # reconstruction scale factor (split in pt bins) multiplied with id en iso scale factors
         for reco_mask, reco_name in ((recoabove75_mask, "RecoAbove75"), (reco20to75_mask, "Reco20to75"), (recobelow20_mask, "RecoBelow20")):
