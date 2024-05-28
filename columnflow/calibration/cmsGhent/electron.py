@@ -276,7 +276,7 @@ def electron_ss_init(self: Calibrator) -> None:
     if self.dataset_inst.is_mc:
 
         self.produces |= {
-            f"Electron.pt_{unc_name}_{unc_dir}"
+            f"Electron.pt_electron_{unc_name}_{unc_dir}"
             for unc_name in sources
             for unc_dir in ("up", "down")
         }
