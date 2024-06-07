@@ -34,14 +34,18 @@ def category_ids(
     """
     category_ids = []
 
-    for cat_inst in self.config_inst.get_leaf_categories():
+    parent_cat_masks = {}
+    for cat_inst, d, children_cat in self.config_inst.get_leaf_categories():
         # start with a true mask
-        cat_mask = np.ones(len(events), dtype=bool)
+        cat_mask = parent_cat_masks.get(cat_inst, np.ones(len(events), dtype=bool))
 
         # loop through selectors
         for categorizer in self.categorizer_map[cat_inst]:
             events, mask = self[categorizer](events, **kwargs)
             cat_mask = cat_mask & mask
+
+        for child_cat in children_cat:
+            parent_cat_masks[child_cat] = cat_mask
 
         # covert to nullable array with the category ids or none, then apply ak.singletons
         ids = ak.where(cat_mask, np.float64(cat_inst.id), np.float64(np.nan))
@@ -64,7 +68,7 @@ def category_ids_init(self: Producer) -> None:
     self.categorizer_map = defaultdict(list)
 
     # add all categorizers obtained from leaf category selection expressions to the used columns
-    for cat_inst in self.config_inst.get_leaf_categories():
+    for cat_inst, d, children_cat in self.config_inst.get_leaf_categories():
         # treat all selections as lists of categorizers
         for sel in law.util.make_list(cat_inst.selection):
             if Categorizer.derived_by(sel):
